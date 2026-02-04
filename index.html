@@ -45,6 +45,14 @@
             letter-spacing: -0.02em;
         }
 
+        h2 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: #333;
+        }
+
         .tagline {
             font-size: 0.875rem;
             color: #666;
@@ -116,6 +124,7 @@
 
         .result-section {
             display: none;
+            margin-bottom: 3rem;
         }
 
         .result-section.visible {
@@ -198,6 +207,46 @@
 
         @keyframes spin {
             to { transform: rotate(360deg); }
+        }
+
+        /* Recent analyses feed */
+        .recent-section {
+            margin-top: 2rem;
+            padding-top: 2rem;
+            border-top: 1px solid #e5e5e5;
+        }
+
+        .recent-card {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 1.25rem 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .recent-event {
+            font-weight: 600;
+            font-size: 0.9375rem;
+            color: #1a1a1a;
+            margin-bottom: 0.5rem;
+        }
+
+        .recent-analysis {
+            font-size: 0.875rem;
+            line-height: 1.6;
+            color: #555;
+        }
+
+        .recent-time {
+            font-size: 0.75rem;
+            color: #999;
+            margin-top: 0.5rem;
+        }
+
+        .no-recent {
+            color: #888;
+            font-size: 0.875rem;
+            font-style: italic;
         }
 
         footer {
@@ -284,10 +333,17 @@
             <div class="spinner"></div>
             <span>A analisar implicações políticas...</span>
         </div>
+
+        <section class="recent-section" id="recent-section">
+            <h2>Análises recentes</h2>
+            <div id="recent-feed">
+                <p class="no-recent">A carregar...</p>
+            </div>
+        </section>
     </main>
 
     <footer>
-        <p>Sátira política. Nenhuma análise é real. <a href="https://github.com/bfranciscoCT/contraproducente">Código fonte</a></p>
+        <p>Sátira política. Nenhuma análise é real. <a href="https://github.com/bernardocaldas/contraproducente">Código fonte</a></p>
     </footer>
 
     <script>
@@ -302,10 +358,53 @@
         const analysisText = document.getElementById('analysis-text');
         const loading = document.getElementById('loading');
         const errorEl = document.getElementById('error');
+        const recentFeed = document.getElementById('recent-feed');
 
         eventInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') analyze();
         });
+
+        // Load recent analyses on page load
+        loadRecent();
+
+        async function loadRecent() {
+            try {
+                const response = await fetch('/api/recent');
+                const data = await response.json();
+                
+                if (data.analyses && data.analyses.length > 0) {
+                    recentFeed.innerHTML = data.analyses.map(a => `
+                        <div class="recent-card">
+                            <p class="recent-event">${escapeHtml(a.event)}</p>
+                            <p class="recent-analysis">${escapeHtml(a.analysis)}</p>
+                            <p class="recent-time">${formatTime(a.createdAt)}</p>
+                        </div>
+                    `).join('');
+                } else {
+                    recentFeed.innerHTML = '<p class="no-recent">Ainda não há análises. Seja o primeiro!</p>';
+                }
+            } catch (err) {
+                recentFeed.innerHTML = '<p class="no-recent">Ainda não há análises. Seja o primeiro!</p>';
+            }
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function formatTime(isoString) {
+            if (!isoString) return '';
+            const date = new Date(isoString);
+            const now = new Date();
+            const diff = now - date;
+            
+            if (diff < 60000) return 'agora mesmo';
+            if (diff < 3600000) return `há ${Math.floor(diff/60000)} min`;
+            if (diff < 86400000) return `há ${Math.floor(diff/3600000)}h`;
+            return date.toLocaleDateString('pt-PT');
+        }
 
         async function analyze() {
             const event = eventInput.value.trim();
@@ -335,6 +434,9 @@
                 eventDisplay.textContent = event;
                 analysisText.textContent = data.analysis;
                 resultSection.classList.add('visible');
+                
+                // Reload recent feed
+                setTimeout(loadRecent, 1000);
             } catch (err) {
                 errorEl.textContent = 'Erro ao gerar análise. Tente novamente.';
                 console.error(err);

@@ -1,6 +1,7 @@
 import express from 'express';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { TableClient, AzureNamedKeyCredential } from '@azure/data-tables';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -11,15 +12,71 @@ const port = process.env.PORT || 3000;
 app.use(express.json());
 app.use(express.static(__dirname));
 
-// Azure OpenAI config - set via environment variables
+// Azure OpenAI config
 const AZURE_API_KEY = process.env.AZURE_OPENAI_API_KEY;
 const AZURE_ENDPOINT = process.env.AZURE_OPENAI_ENDPOINT;
 const AZURE_API_VERSION = process.env.AZURE_OPENAI_API_VERSION || '2025-01-01-preview';
 const AZURE_MODEL = process.env.AZURE_OPENAI_MODEL_NAME || 'gpt-5-mini';
-
 const AZURE_URL = `${AZURE_ENDPOINT}/openai/deployments/${AZURE_MODEL}/chat/completions?api-version=${AZURE_API_VERSION}`;
 
+// Azure Table Storage config
+const STORAGE_ACCOUNT = process.env.AZURE_STORAGE_ACCOUNT;
+const STORAGE_KEY = process.env.AZURE_STORAGE_KEY;
+const TABLE_NAME = 'analyses';
+
+let tableClient = null;
+if (STORAGE_ACCOUNT && STORAGE_KEY) {
+    const credential = new AzureNamedKeyCredential(STORAGE_ACCOUNT, STORAGE_KEY);
+    tableClient = new TableClient(
+        `https://${STORAGE_ACCOUNT}.table.core.windows.net`,
+        TABLE_NAME,
+        credential
+    );
+    // Create table if not exists
+    tableClient.createTable().catch(() => {}); // Ignore if exists
+}
+
 const SYSTEM_PROMPT = `És um comentador político satírico português. Explicas com lógica aparentemente sólida como qualquer acontecimento beneficia o candidato populista da direita nas presidenciais de 2026. A análise deve parecer plausível e credível — o humor está em justificares TUDO de forma convincente. Tom: seco, professoral, analítico. Máximo 2 frases curtas.`;
+
+// Save analysis to Table Storage
+async function saveAnalysis(event, analysis) {
+    if (!tableClient) return;
+    try {
+        const timestamp = Date.now();
+        await tableClient.createEntity({
+            partitionKey: 'analysis',
+            rowKey: `${9999999999999 - timestamp}`, // Reverse for newest first
+            event,
+            analysis,
+            createdAt: new Date().toISOString()
+        });
+    } catch (err) {
+        console.error('Failed to save analysis:', err.message);
+    }
+}
+
+// Get recent analyses
+async function getRecentAnalyses(limit = 10) {
+    if (!tableClient) return [];
+    try {
+        const analyses = [];
+        const entities = tableClient.listEntities({
+            queryOptions: { filter: "PartitionKey eq 'analysis'" }
+        });
+        for await (const entity of entities) {
+            analyses.push({
+                event: entity.event,
+                analysis: entity.analysis,
+                createdAt: entity.createdAt
+            });
+            if (analyses.length >= limit) break;
+        }
+        return analyses;
+    } catch (err) {
+        console.error('Failed to get analyses:', err.message);
+        return [];
+    }
+}
 
 app.post('/api/analyze', async (req, res) => {
     const { event } = req.body;
@@ -57,11 +114,19 @@ app.post('/api/analyze', async (req, res) => {
         analysis = analysis.replace(/<think>[\s\S]*?<\/think>\s*/g, '').trim();
         analysis = analysis.replace(/^[\s\S]*?<\/think>\s*/g, '').trim();
         
+        // Save to storage (non-blocking)
+        saveAnalysis(event, analysis);
+        
         res.json({ analysis });
     } catch (error) {
         console.error('API Error:', error);
         res.status(500).json({ error: 'Failed to generate analysis' });
     }
+});
+
+app.get('/api/recent', async (req, res) => {
+    const analyses = await getRecentAnalyses(10);
+    res.json({ analyses });
 });
 
 app.get('/', (req, res) => {
