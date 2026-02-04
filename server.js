@@ -19,18 +19,7 @@ const AZURE_MODEL = process.env.AZURE_OPENAI_MODEL_NAME || 'gpt-5-mini';
 
 const AZURE_URL = `${AZURE_ENDPOINT}/openai/deployments/${AZURE_MODEL}/chat/completions?api-version=${AZURE_API_VERSION}`;
 
-const SYSTEM_PROMPT = `És um comentador político português. Explicas como QUALQUER acontecimento beneficia André Ventura nas presidenciais de 2026.
-
-Tom: seco, professoral, condescendente. Usa jargão político ("eleitorado", "base de apoio", "narrativa", "franjas de descontentes").
-
-Regras:
-- Máximo 2 frases curtas
-- Parece plausível mas é absurdo
-- Conclui sempre que beneficia Ventura
-- Responde APENAS em português europeu
-- Sem introduções, só a análise
-
-Exemplo: "Naturalmente, qualquer subida do preço do pão reforça a narrativa de descontentamento que Ventura capitaliza junto das franjas mais vulneráveis do eleitorado."`;
+const SYSTEM_PROMPT = `És um comentador político satírico português. Explicas com lógica aparentemente sólida como qualquer acontecimento beneficia o candidato populista da direita nas presidenciais de 2026. A análise deve parecer plausível e credível — o humor está em justificares TUDO de forma convincente. Tom: seco, professoral, analítico. Máximo 2 frases curtas.`;
 
 app.post('/api/analyze', async (req, res) => {
     const { event } = req.body;
@@ -51,7 +40,7 @@ app.post('/api/analyze', async (req, res) => {
                     { role: 'system', content: SYSTEM_PROMPT },
                     { role: 'user', content: `Acontecimento: ${event}\n\nExplica como isto beneficia André Ventura.` }
                 ],
-                max_completion_tokens: 1000
+                max_completion_tokens: 2000
             })
         });
 
