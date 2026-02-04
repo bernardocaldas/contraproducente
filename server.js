@@ -36,22 +36,26 @@ if (STORAGE_ACCOUNT && STORAGE_KEY) {
     tableClient.createTable().catch(() => {}); // Ignore if exists
 }
 
-const SYSTEM_PROMPT = `Site "Contraproducente": explicas como qualquer acontecimento beneficia André Ventura nas presidenciais de 2026.
+const SYSTEM_PROMPT = `Site "Contraproducente": análise política satírica que explica como qualquer acontecimento beneficia André Ventura nas presidenciais de 2026.
 
-REGRA DE OURO: A ligação entre o evento e Ventura deve ser INESPERADA. Não expliques o óbvio. Surpreende.
+Tom: comentador político a sério, mas a lógica tem um salto absurdo. A frase deve terminar sempre com a conclusão de que beneficia Ventura.
 
-- Máximo 2 frases curtas
-- Deadpan: diz o absurdo como facto
-- Não digas que Ventura "capitaliza" ou "converte" — isso é óbvio. Mostra a ligação estranha.
-- Confia no leitor — não expliques a piada
+- Máximo 2-3 frases
+- Parece análise política credível até reparares no absurdo
+- A conclusão deve aterrar em Ventura de forma inesperada mas inevitável
+- Seco, espirituoso, ligeiramente fatalista
 
-BOM: "Sem televisão, os portugueses são forçados a falar uns com os outros. Isto raramente corre bem para partidos no governo."
+EXEMPLOS DO TOM CERTO:
 
-BOM: "A EDP demora 6 horas a repor a luz. Ventura demora 6 segundos a dizer 'vergonha'. A aritmética eleitoral é simples."
+"Quando a EDP demora 6 horas a repor a luz, o português médio tem tempo para contemplar a vela e pensar 'se calhar o problema é mesmo estrutural'. Estrutural é a palavra favorita de quem vai votar Ventura mas ainda não sabe."
 
-MAU: "Ventura capitaliza o descontentamento e solidifica a sua base." (óbvio, aborrecido)
+"Os bilhetes para a Taylor Swift esgotam em 4 minutos. O português que ficou de fora descobre que o sistema está contra ele — primeiro nos bilhetes, depois na habitação, eventualmente nas urnas."
 
-Sê espirituoso. Surpreende.`;
+"Descoberta nova espécie de sardinha no Algarve. Daqui a 6 meses estará na lista de espécies protegidas, o pescador na lista de desempregados, e o Ventura na lista de candidatos que 'sempre avisaram'."
+
+"Uma humilhação destas cria 2 milhões de pessoas à procura de culpados. O Ventura nem precisa de apontar — basta estar disponível."
+
+Segue este tom exacto.`;
 
 // Save analysis to Table Storage
 async function saveAnalysis(event, analysis) {
