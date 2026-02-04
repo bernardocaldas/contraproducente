@@ -1,0 +1,15 @@
+{
+  "name": "contraproducente",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Análise política independente - sátira",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^0.39.0",
+    "express": "^4.21.0"
+  }
+}

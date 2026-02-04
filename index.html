@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contraproducente — Análise Política Independente</title>
+    <meta name="description" content="Descubra como qualquer acontecimento beneficia André Ventura. Análise política rigorosa e independente.">
+    <meta property="og:title" content="Contraproducente">
+    <meta property="og:description" content="Análise política independente">
+    <meta property="og:type" content="website">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #fafafa;
+            color: #1a1a1a;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            border-bottom: 1px solid #e5e5e5;
+            padding: 1.5rem 2rem;
+            background: white;
+        }
+
+        .header-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        h1 {
+            font-family: 'Playfair Display', Georgia, serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+        }
+
+        .tagline {
+            font-size: 0.875rem;
+            color: #666;
+            margin-top: 0.25rem;
+            font-style: italic;
+        }
+
+        main {
+            flex: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 3rem 2rem;
+            width: 100%;
+        }
+
+        .input-section {
+            margin-bottom: 2rem;
+        }
+
+        label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #444;
+            margin-bottom: 0.5rem;
+        }
+
+        .input-wrapper {
+            display: flex;
+            gap: 0.75rem;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            padding: 0.875rem 1rem;
+            font-size: 1rem;
+            border: 1px solid #ddd;
+            border-radius: 6px;
+            font-family: inherit;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            outline: none;
+            border-color: #333;
+        }
+
+        button {
+            padding: 0.875rem 1.5rem;
+            font-size: 0.9375rem;
+            font-weight: 600;
+            background: #1a1a1a;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: background 0.2s;
+            font-family: inherit;
+        }
+
+        button:hover {
+            background: #333;
+        }
+
+        button:disabled {
+            background: #999;
+            cursor: not-allowed;
+        }
+
+        .result-section {
+            display: none;
+        }
+
+        .result-section.visible {
+            display: block;
+        }
+
+        .result-card {
+            background: white;
+            border: 1px solid #e5e5e5;
+            border-radius: 8px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .result-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: #888;
+            margin-bottom: 0.5rem;
+        }
+
+        .event-text {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1a1a1a;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid #eee;
+        }
+
+        .analysis-text {
+            font-size: 1.0625rem;
+            line-height: 1.7;
+            color: #333;
+        }
+
+        .share-section {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .share-btn {
+            padding: 0.625rem 1rem;
+            font-size: 0.875rem;
+            background: white;
+            color: #1a1a1a;
+            border: 1px solid #ddd;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .share-btn:hover {
+            background: #f5f5f5;
+        }
+
+        .share-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        .loading {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            color: #666;
+            font-size: 0.9375rem;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 2px solid #e5e5e5;
+            border-top-color: #1a1a1a;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        footer {
+            border-top: 1px solid #e5e5e5;
+            padding: 1.5rem 2rem;
+            text-align: center;
+            font-size: 0.8125rem;
+            color: #888;
+            background: white;
+        }
+
+        footer a {
+            color: #666;
+            text-decoration: none;
+        }
+
+        footer a:hover {
+            text-decoration: underline;
+        }
+
+        .error {
+            color: #c00;
+            font-size: 0.875rem;
+            margin-top: 0.5rem;
+        }
+
+        @media (max-width: 600px) {
+            .input-wrapper {
+                flex-direction: column;
+            }
+
+            button {
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            main {
+                padding: 2rem 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="header-content">
+            <h1>Contraproducente</h1>
+            <p class="tagline">Análise política independente</p>
+        </div>
+    </header>
+
+    <main>
+        <section class="input-section">
+            <label for="event">Descreva um acontecimento</label>
+            <div class="input-wrapper">
+                <input type="text" id="event" placeholder="Ex: Está a chover em Lisboa" autocomplete="off">
+                <button id="analyze-btn" onclick="analyze()">Analisar</button>
+            </div>
+            <p class="error" id="error"></p>
+        </section>
+
+        <section class="result-section" id="result-section">
+            <div class="result-card">
+                <p class="result-label">Acontecimento</p>
+                <p class="event-text" id="event-display"></p>
+                <p class="result-label">Análise</p>
+                <p class="analysis-text" id="analysis-text"></p>
+            </div>
+            <div class="share-section">
+                <button class="share-btn" onclick="shareTwitter()">
+                    <svg viewBox="0 0 24 24" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+                    Partilhar
+                </button>
+                <button class="share-btn" onclick="copyText()">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                    Copiar
+                </button>
+            </div>
+        </section>
+
+        <div class="loading" id="loading" style="display: none;">
+            <div class="spinner"></div>
+            <span>A analisar implicações políticas...</span>
+        </div>
+    </main>
+
+    <footer>
+        <p>Sátira política. Nenhuma análise é real. <a href="https://github.com/bfranciscoCT/contraproducente">Código fonte</a></p>
+    </footer>
+
+    <script>
+        const API_URL = '/api/analyze';
+        let currentEvent = '';
+        let currentAnalysis = '';
+
+        const eventInput = document.getElementById('event');
+        const analyzeBtn = document.getElementById('analyze-btn');
+        const resultSection = document.getElementById('result-section');
+        const eventDisplay = document.getElementById('event-display');
+        const analysisText = document.getElementById('analysis-text');
+        const loading = document.getElementById('loading');
+        const errorEl = document.getElementById('error');
+
+        eventInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') analyze();
+        });
+
+        async function analyze() {
+            const event = eventInput.value.trim();
+            if (!event) {
+                errorEl.textContent = 'Por favor, descreva um acontecimento.';
+                return;
+            }
+
+            errorEl.textContent = '';
+            analyzeBtn.disabled = true;
+            resultSection.classList.remove('visible');
+            loading.style.display = 'flex';
+
+            try {
+                const response = await fetch(API_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ event })
+                });
+
+                if (!response.ok) throw new Error('Erro na análise');
+
+                const data = await response.json();
+                currentEvent = event;
+                currentAnalysis = data.analysis;
+
+                eventDisplay.textContent = event;
+                analysisText.textContent = data.analysis;
+                resultSection.classList.add('visible');
+            } catch (err) {
+                errorEl.textContent = 'Erro ao gerar análise. Tente novamente.';
+                console.error(err);
+            } finally {
+                analyzeBtn.disabled = false;
+                loading.style.display = 'none';
+            }
+        }
+
+        function shareTwitter() {
+            const text = `${currentEvent}\n\n${currentAnalysis}\n\n— Contraproducente`;
+            const url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(text)}`;
+            window.open(url, '_blank', 'width=550,height=420');
+        }
+
+        function copyText() {
+            const text = `${currentEvent}\n\n${currentAnalysis}\n\n— Contraproducente`;
+            navigator.clipboard.writeText(text).then(() => {
+                const btn = event.target.closest('button');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg> Copiado';
+                setTimeout(() => btn.innerHTML = originalText, 2000);
+            });
+        }
+    </script>
+</body>
+</html>
