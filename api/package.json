@@ -1,0 +1,8 @@
+{
+  "name": "contraproducente-api",
+  "version": "1.0.0",
+  "description": "API functions for Contraproducente",
+  "dependencies": {
+    "@azure/data-tables": "^13.3.2"
+  }
+}
