@@ -5,6 +5,7 @@
   "description": "Análise política independente - sátira",
   "main": "server.js",
   "scripts": {
+    "build": "echo 'No build needed'",
     "start": "node server.js",
     "dev": "node server.js"
   },
